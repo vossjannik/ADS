@@ -24,8 +24,6 @@ jobs:
         run: sudo apt update -y && sudo apt install -y ninja-build
       - uses: actions/checkout@v2
       - name: compile library
-        run: meson build && ninja -C build
-      - name: compile example
         run: cmake -S . -B build && cmake --build build
       - uses: actions/upload-artifact@v2
         with:
