@@ -38,12 +38,12 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: ubuntu-meson
-        path: $GITHUB_WORKSPACE/build-ubuntu-meson
+        path: ./build-ubuntu-meson
     - name: Download artifact ubuntu-cmake
       uses: actions/download-artifact@v3
       with:
         name: ubuntu-cmake
-        path: $GITHUB_WORKSPACE/build-ubuntu-cmake
+        path: ./build-ubuntu-cmake
     - name: 'List what is in the working directory'
       shell: bash
       run: |
