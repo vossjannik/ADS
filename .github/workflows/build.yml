@@ -34,15 +34,44 @@ jobs:
     needs: [build-ubuntu-meson, build-ubuntu-cmake]
     runs-on: ubuntu-latest
     steps:
-    - name: Download artifact ubuntu-cmake
+    - name: Download artifact ubuntu-meson
       uses: actions/download-artifact@v3
       with:
         name: ubuntu-meson
+        path: $GITHUB_WORKSPACE/build-ubuntu-meson
     - name: Download artifact ubuntu-cmake
       uses: actions/download-artifact@v3
       with:
         name: ubuntu-cmake
+        path: $GITHUB_WORKSPACE/build-ubuntu-cmake
     - name: 'List what is in the working directory'
       shell: bash
       run: |
         ls -la && find .
+
+    - name: 'Compress files for the linux-x64 release artifact'
+      shell: bash
+      run: |
+        zip --junk-paths ./linux-x64.zip ./build-ubuntu-cmake/**/*.so ./build-ubuntu-cmake/**/*.so.* ./build-ubuntu-meson/**/adstool
+
+    - name: Create release
+      # if: github.ref == 'refs/heads/main'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: 0.0.25-github-${{ github.run_number }}
+        release_name: 0.0.25-github-${{ github.run_number }}
+        generate_release_notes: true
+
+    - name: 'Upload release asset'
+      # if: github.ref == 'refs/heads/main'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./linux-x64.zip
+        asset_name: linux-x64.zip
+        asset_content_type: application/zip
