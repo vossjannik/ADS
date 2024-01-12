@@ -48,25 +48,30 @@ jobs:
       shell: bash
       run: |
         ls -la && find .
+   
+    - name: 'Obtain the current version number from the adstool. We need it to create the release.'
+      shell: bash
+      run: |
+        echo "GITHUB_ADSLIB_VERSION_NUMBER=$(./build-ubuntu-meson/build/adstool --version)" >> $GITHUB_ENV
 
     - name: 'Compress files for the linux-x64 release artifact'
       shell: bash
       run: |
-        zip --junk-paths ./linux-x64.zip ./build-ubuntu-cmake/**/*.so ./build-ubuntu-cmake/**/*.so.* ./build-ubuntu-meson/**/adstool
+        zip --junk-paths ./linux-x64.zip ./build-ubuntu-cmake/**/*.so ./build-ubuntu-cmake/**/*.so.* ./build-ubuntu-meson/build/adstool
 
     - name: Create release
-      if: github.ref == 'refs/heads/main'
+      #if: github.ref == 'refs/heads/main'
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: 0.0.25-github-${{ github.run_number }}
-        release_name: 0.0.25-github-${{ github.run_number }}
+        tag_name: ${{ env.GITHUB_ADSLIB_VERSION_NUMBER }}-github-${{ github.run_number }}
+        release_name: ${{ env.GITHUB_ADSLIB_VERSION_NUMBER }}-github-${{ github.run_number }}
         generate_release_notes: true
 
     - name: 'Upload release asset'
-      if: github.ref == 'refs/heads/main'
+      #if: github.ref == 'refs/heads/main'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
