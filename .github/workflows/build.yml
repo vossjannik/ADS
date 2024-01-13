@@ -52,6 +52,7 @@ jobs:
     - name: 'Obtain the current version number from the adstool. We need it to create the release.'
       shell: bash
       run: |
+        sudo chmod +x ./build-ubuntu-meson/build/adstool
         echo "GITHUB_ADSLIB_VERSION_NUMBER=$(./build-ubuntu-meson/build/adstool --version)" >> $GITHUB_ENV
 
     - name: 'Compress files for the linux-x64 release artifact'
