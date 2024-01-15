@@ -34,6 +34,7 @@ jobs:
     needs: [build-ubuntu-meson, build-ubuntu-cmake]
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Download artifact ubuntu-meson
       uses: actions/download-artifact@v3
       with:
@@ -44,16 +45,12 @@ jobs:
       with:
         name: ubuntu-cmake
         path: ./build-ubuntu-cmake
-    - name: 'List what is in the working directory'
-      shell: bash
-      run: |
-        ls -la && find .
-   
+
     - name: 'Obtain the current version number from the adstool. We need it to create the release.'
       shell: bash
       run: |
         sudo chmod +x ./build-ubuntu-meson/build/adstool
-        echo "GITHUB_ADSLIB_VERSION_NUMBER=$(./build-ubuntu-meson/build/adstool --version)" >> $GITHUB_ENV
+        echo "GITHUB_ADSLIB_VERSION_NUMBER=$(dpkg-parsechangelog -SVersion --file ./debian/changelog)" >> $GITHUB_ENV
 
     - name: 'Compress files for the linux-x64 release artifact'
       shell: bash
