@@ -49,7 +49,6 @@ jobs:
     - name: 'Obtain the current version number from the adstool. We need it to create the release.'
       shell: bash
       run: |
-        sudo chmod +x ./build-ubuntu-meson/build/adstool
         echo "GITHUB_ADSLIB_VERSION_NUMBER=$(dpkg-parsechangelog -SVersion --file ./debian/changelog)" >> $GITHUB_ENV
 
     - name: 'Compress files for the linux-x64 release artifact'
@@ -57,19 +56,23 @@ jobs:
       run: |
         zip --junk-paths ./linux-x64.zip ./build-ubuntu-cmake/**/*.so ./build-ubuntu-cmake/**/*.so.* ./build-ubuntu-meson/build/adstool
 
-    - name: Create release
-      if: github.ref == 'refs/heads/master'
+    - name: 'Check if the release exists'
+      shell: bash
+      run: |
+        gh release list
+    - name: Create release if it does not exist
+      # if: github.ref == 'refs/heads/master'
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.GITHUB_ADSLIB_VERSION_NUMBER }}-github-${{ github.run_number }}
-        release_name: ${{ env.GITHUB_ADSLIB_VERSION_NUMBER }}-github-${{ github.run_number }}
+        tag_name: ${{ env.GITHUB_ADSLIB_VERSION_NUMBER }}
+        release_name: ${{ env.GITHUB_ADSLIB_VERSION_NUMBER }}
         generate_release_notes: true
 
     - name: 'Upload release asset'
-      if: github.ref == 'refs/heads/master'
+      if: steps.create_release.outcome == 'success'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
