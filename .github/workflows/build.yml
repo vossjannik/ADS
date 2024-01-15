@@ -58,10 +58,17 @@ jobs:
 
     - name: 'Check if the release exists'
       shell: bash
-      run: |
-        gh release list
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |          
+        if gh release view ${{ env.GITHUB_ADSLIB_VERSION_NUMBER }}; then
+          echo "GITHUB_ADSLIB_RELEASE_EXISTS=true" >> "$GITHUB_ENV"
+        else
+          echo "GITHUB_ADSLIB_RELEASE_EXISTS=false" >> "$GITHUB_ENV"
+        fi
     - name: Create release if it does not exist
       # if: github.ref == 'refs/heads/master'
+      if: env.GITHUB_ADSLIB_RELEASE_EXISTS != 'true'
       id: create_release
       uses: actions/create-release@v1
       env:
