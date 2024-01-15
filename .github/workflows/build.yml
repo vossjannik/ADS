@@ -58,7 +58,7 @@ jobs:
         zip --junk-paths ./linux-x64.zip ./build-ubuntu-cmake/**/*.so ./build-ubuntu-cmake/**/*.so.* ./build-ubuntu-meson/build/adstool
 
     - name: Create release
-      if: github.ref == 'refs/heads/main'
+      # if: github.ref == 'refs/heads/main'
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -69,7 +69,7 @@ jobs:
         generate_release_notes: true
 
     - name: 'Upload release asset'
-      if: github.ref == 'refs/heads/main'
+      # if: github.ref == 'refs/heads/main'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
